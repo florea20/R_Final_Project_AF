@@ -1,0 +1,124 @@
+---
+title: "R Project_Breast_Cancer"
+author: "Amanda Flores"
+date: "2024-08-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Importing libraries
+
+install.packages("dplyr")
+install.packages("tidyr")
+install.packages("ggplot2")
+install.packages("GGally")
+install.packages("RColorBrewer")
+install.packages("reshape2")
+
+# Loading the packages
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(reshape2) 
+library(GGally)
+library(RColorBrewer)
+
+#Reading the data in csv
+setwd("~/Desktop/Final Project R")
+data <- read.csv("breast_cancer.csv")  
+#checking the first few rows
+head(data)
+View(data)
+
+#Checking the data structure
+str(data)
+
+###Cleaning
+#Checked the missing values 
+anyNA(data)
+# Counting missing values per column
+missing_counts <- colSums(is.na(data))
+print(missing_counts)
+
+# Checked rows with missing values
+missing_rows <- data[!complete.cases(data), ]
+print(missing_rows)
+
+#Removed Index column
+if ("X" %in% names(data)) {
+  data$X <- NULL
+}
+
+
+#Data Exploration
+#I wanted to check the proportion of malignant and benign tumors in the dataset
+library(ggplot2)
+ggplot(data, aes(x = diagnosis)) +
+  geom_bar(fill = "skyblue") +
+  labs(title = "Distribution of Tumor Diagnosis",
+       x = "Diagnosis",
+       y = "Count")
+
+
+
+#Feature Analysis to compare the distribution of radius mean between malignant and benign tumors
+ggplot(data, aes(x = diagnosis, y = radius_mean, fill = diagnosis)) +
+  geom_boxplot() +
+  labs(title = "Radius Mean by Diagnosis",
+       x = "Diagnosis",
+       y = "Radius Mean")
+
+
+
+# Create interaction plot
+ggplot(data, aes(x = radius_mean, y = texture_mean, color = diagnosis)) +
+  geom_point(alpha = 0.6) +
+  labs(title = "Interaction between Radius Mean and Texture Mean",
+       x = "Radius Mean",
+       y = "Texture Mean",
+       color = "Diagnosis") +
+  theme_minimal()
+
+
+
+
+# Boxplots
+boxplot_radius_mean <- ggplot(data, aes(x = diagnosis, y = radius_mean, fill = diagnosis)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Radius Mean by Diagnosis",
+       x = "Diagnosis",
+       y = "Radius Mean") +
+  theme_minimal()
+
+
+boxplot_texture_mean <- ggplot(data, aes(x = diagnosis, y = texture_mean, fill = diagnosis)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Texture Mean by Diagnosis",
+       x = "Diagnosis",
+       y = "Texture Mean") +
+  theme_minimal()
+
+
+boxplot_area_mean <- ggplot(data, aes(x = diagnosis, y = area_mean, fill = diagnosis)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Area Mean by Diagnosis",
+       x = "Diagnosis",
+       y = "Area Mean") +
+  theme_minimal()
+
+
+
+# Pair Plot of Key Features
+key_features <- data[, c("radius_mean", "texture_mean", "area_mean", "perimeter_mean", "smoothness_mean")]
+key_features$diagnosis <- data$diagnosis
+
+pair_plot <- ggpairs(key_features, aes(color = diagnosis)) +
+  labs(title = "Pair Plot of Key Features")
+
+
+print(pair_plot)
+
+View(data)
